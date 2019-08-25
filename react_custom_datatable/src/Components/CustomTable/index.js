@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './datatable.css';
+import './custom.css';
 import { PropTypes } from 'prop-types';
 import Pagination from '../Pagination';
 
