@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './custom.css';
+import './CustomTable.css';
 import { PropTypes } from 'prop-types';
-import Pagination from '../Pagination';
+import Pagination from '../Paginate';
 
 export default class CustomTable extends React.Component {
     jsonData = null
@@ -21,36 +21,12 @@ export default class CustomTable extends React.Component {
             currentPage: 1,
         }
 
-        this.keyField = props.keyField || "id";
-        this.noData = props.noData || "No records found!";
+        this.keyField = props.keyField || "id"; // uniq identifer for colmn
+        this.noData = props.noData || "No records found!"; //if no data in table
         this.width = props.width || "100%";
 
-        // Add pagination support
+        // Adding pagination
         this.pagination = this.props.pagination || {};
-    }
-
-    onDragOver = (e) => {
-        e.preventDefault();
-    }
-
-    onDragStart = (e, source) => {
-        e.dataTransfer.setData('text/plain', source);
-    }
-
-    onDrop = (e, target) => {
-        e.preventDefault();
-        let source = e.dataTransfer.getData('text/plain');
-        let headers = [...this.state.headers];
-        let srcHeader = headers[source];
-        let targetHeader = headers[target];
-
-        let temp = srcHeader.index;
-        srcHeader.index = targetHeader.index;
-        targetHeader.index = temp;
-
-        this.setState({
-            headers
-        });
     }
 
     tableHeader = () => {
@@ -71,13 +47,9 @@ export default class CustomTable extends React.Component {
 
             return (
                 <th key={cleanTitle}
-                    ref={(th) => this[cleanTitle] = th}
                     style={{ width: width }}
-                    data-col={cleanTitle}
-                    onDragStart={(e) => this.onDragStart(e, index)}
-                    onDragOver={this.onDragOver}
-                    onDrop={(e) => { this.onDrop(e, index) }}>
-                    <span draggable data-col={cleanTitle} className="header-cell">
+                    data-col={cleanTitle}>
+                    <span draggable data-col={cleanTitle} >
                         {title}
                     </span>
                 </th>
@@ -126,8 +98,16 @@ export default class CustomTable extends React.Component {
                 let cell = header.cell;
                 if (cell) {
                     if (typeof (cell) === "object") {
-                        if (cell.type === "image" && content) {
-                            content = <img style={cell.style} src={content} />
+                        if (cell.type === "date" && content) {
+                            let get_date = new Date(content)
+                            if (get_date.toString() === 'Invalid Date')
+                                content =  <input name={id}  type="date" />
+                            else
+                                {  
+                                    let data = get_date
+                                    let formatted_date = data.getFullYear().toString()+'-' + ('0'+(data.getMonth()+1).toString()).slice(-2)+'-' +('0'+data.getDate().toString()).slice(-2)
+                                    content =  <input name={id} defaultValue={formatted_date} type="date" />
+                                }
                         }
                     } else if (typeof (cell) === "function") {
                         content = cell(row);
@@ -166,7 +146,7 @@ export default class CustomTable extends React.Component {
     }
 
     onSort = (e) => {
-        let data = this.state.data.slice(); // Give new array
+        let data = this.state.data.slice();
         let colIndex = ReactDOM.findDOMNode(e.target).parentNode.cellIndex;
         let colTitle = e.target.dataset.col;
 
@@ -319,17 +299,6 @@ export default class CustomTable extends React.Component {
         }
     }
 
-    searchBar = () => {
-        return (
-            <div className="toolbar">
-                <button onClick={this.onToggleSearch}>
-                    Search
-                </button>
-            </div>
-
-        );
-    }
-
     getPagedData = (pageNo, pageLength) => {
         let startOfRecord = (pageNo - 1) * pageLength;
         let endOfRecord = startOfRecord + pageLength;
@@ -392,7 +361,6 @@ export default class CustomTable extends React.Component {
                         currentPage={this.state.currentPage}
                     />
                 }
-                {this.searchBar()}
                 {this.getTable()}
             </div>
         )
@@ -400,10 +368,10 @@ export default class CustomTable extends React.Component {
 }
 
 CustomTable.propTypes = {
-  data: PropTypes.object,
+  data: PropTypes.array,
   header: PropTypes.object,
   pagination:PropTypes.object,
   keyField:PropTypes.string,
-  noData:PropTypes.boolean,
+  noData:PropTypes.string,
   width:PropTypes.string
 };

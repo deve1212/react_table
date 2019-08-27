@@ -1,5 +1,5 @@
 import React, {Fragment, Component } from 'react';
-import './pagination.css';
+import './Paginate.css';
 
 export default class Pagination extends Component {
     constructor(props) {
@@ -40,17 +40,11 @@ export default class Pagination extends Component {
     }
       
     _getPaginationButtons = (text) => {
-        let classNames = 'pagination-btn';
-        
-        // May need refactor
-        if (this.state.currentPage == text) {
-            classNames += ' current-page';
-        }
+       
 
         let html = (
             <button key={`btn-${text}`}
                 id={`btn-${text}`}
-                className={classNames}
                 onClick={(e)=>{this.onGotoPage(text)}}
             >{text}
             </button>
@@ -85,7 +79,7 @@ export default class Pagination extends Component {
 
         let pageSelector = (
             <Fragment key="f-page-selector">
-                <span key="page-selector" className="page-selector">
+                <span key="page-selector">
                     Rows per page:
                     <input key="page-input"
                       type="number"
@@ -100,7 +94,6 @@ export default class Pagination extends Component {
 
         let prevButton = (
             <button key="prev"
-                className="pagination-btn prev"
                 onClick={this.onPrevPage}>
                 {"<"}
             </button>
@@ -109,7 +102,6 @@ export default class Pagination extends Component {
 
         let nextButton = (
             <button key="next"
-                className="pagination-btn next"
                 onClick={this.onNextPage}>
                 {">"}
             </button>
@@ -124,7 +116,6 @@ export default class Pagination extends Component {
         } else if (this.props.type === "short") {
             buttons.push(
                 <input key="currentPageInput"
-                    className="current-page-input"
                     type="number"
                     max={this.pages}
                     defaultValue={this.state.currentPage}
@@ -134,7 +125,7 @@ export default class Pagination extends Component {
         }
 
         return (
-            <div className="pagination">
+            <div>
             {
                 [pageSelector, prevButton, buttons, nextButton]
             }
